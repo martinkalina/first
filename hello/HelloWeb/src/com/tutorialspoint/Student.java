@@ -1,5 +1,10 @@
 package com.tutorialspoint;
-
+/**
+ * Student model bean.
+ * 
+ * @author Martin Kalina
+ *
+ */
 public class Student {
    private Integer age;
    private String name;

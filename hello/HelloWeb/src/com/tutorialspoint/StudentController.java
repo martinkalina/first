@@ -7,6 +7,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.ui.ModelMap;
 
+/**
+ * Controller for urls: /student, /addStudent
+ * @author Martin Kalina
+ *
+ */
 @Controller
 public class StudentController {
 
