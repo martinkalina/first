@@ -2,12 +2,10 @@ package cz.jpower8.scheduler.model;
 
 import javax.xml.bind.annotation.XmlElementRef;
 
-import org.quartz.Job;
-
 public class Task {
 	
 	private String id;
-	private AbstractTrigger trigger;
+	private ITrigger trigger;
 	private Condition condition;
 
 	private String jobClass;
@@ -21,11 +19,11 @@ public class Task {
 		return id;
 	}
 
-	public AbstractTrigger getTrigger() {
+	public ITrigger getTrigger() {
 		return trigger;
 	}
 
-	public void setTrigger(AbstractTrigger trigger) {
+	public void setTrigger(ITrigger trigger) {
 		this.trigger = trigger;
 	}
 
