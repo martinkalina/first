@@ -2,23 +2,26 @@ package cz.jpower8.scheduler.quartz;
 
 import static org.quartz.JobBuilder.newJob;
 
+import org.quartz.Job;
 import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
+import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.listeners.TriggerListenerSupport;
 import org.quartz.plugins.management.ShutdownHookPlugin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import cz.jpower8.scheduler.IScheduler;
 import cz.jpower8.scheduler.model.Task;
 
 public class QuartzDelegate implements IScheduler {
 
-	private static final Logger log = LoggerFactory.getLogger(QuartzDelegate.class);
+//	private static final Logger log = LoggerFactory.getLogger(QuartzDelegate.class);
 	
 	private Scheduler quartz;
 
+	
 	public QuartzDelegate() {
 		try {
 			quartz = StdSchedulerFactory.getDefaultScheduler();
@@ -29,17 +32,28 @@ public class QuartzDelegate implements IScheduler {
 	}
 
 	@Override
-	public void schedule(Task task) {
+	public void schedule(final Task task) {
 		
 		try {
-			JobDetail wrap = newJob(JobConditionWrapper.class)
-					.withIdentity(task.getId())
+			@SuppressWarnings("unchecked")
+			Class<? extends Job> clazz = (Class<? extends Job>) Class.forName(task.getJobClass());
+			final JobDetail jobDetail = newJob(clazz).withIdentity(task.getId())
 					.storeDurably()
 					.build();
-			wrap.getJobDataMap().put(JobConditionWrapper.WRAPPED_JOB_CLASS, Class.forName(task.getJobClass()));
-			wrap.getJobDataMap().put(JobConditionWrapper.TASK_CONDITION, task.getCondition());
-			wrap.getJobDataMap().put(JobConditionWrapper.TASK_ID, task.getId());
-			quartz.addJob(wrap, true);
+			quartz.addJob(jobDetail, true);
+			quartz.getListenerManager().addTriggerListener(new TriggerListenerSupport() {
+				@Override
+				public String getName() {
+					return "Condition Evaluator";
+				}
+				@Override
+				public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
+					boolean jobFound = context.getJobDetail().equals(jobDetail);
+					boolean condition = task.getCondition().evaluate();
+					return jobFound && !condition;
+				}
+			});
+			
 			task.getTrigger().register(this, task.getId());
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Cant load job class", e);

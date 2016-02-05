@@ -4,8 +4,6 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.util.Date;
 
-import org.quartz.CronScheduleBuilder;
-import org.quartz.CronTrigger;
 import org.quartz.ScheduleBuilder;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -22,9 +20,9 @@ public abstract class AbstractTimer implements ITrigger {
 	@Override
 	public void register(IScheduler scheduler, String taskId) {
 		if (scheduler instanceof QuartzDelegate){
-			CronScheduleBuilder schedule = (CronScheduleBuilder) createTimeSchedule();
+			ScheduleBuilder<?> schedule = createTimeSchedule();
 			
-			CronTrigger trigger = newTrigger().forJob(taskId).withSchedule(schedule).build();
+			Trigger trigger = newTrigger().forJob(taskId).withSchedule(schedule).build();
 			try {
 				Date date = ((QuartzDelegate) scheduler).getQuartz().scheduleJob(trigger);
 				log.debug("Task '{}' time scheduled, next run on {}", taskId, date);

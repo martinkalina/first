@@ -8,7 +8,6 @@ import org.junit.Test;
 import com.thoughtworks.xstream.XStream;
 
 import cz.jpower8.scheduler.model.Task;
-import cz.jpower8.scheduler.model.trigger.CronTimer;
 
 public class TestXstreamConfig {
 
@@ -19,7 +18,6 @@ public class TestXstreamConfig {
 			System.out.println(xml);
 			Task task2 = unmarshall(xml);
 			Assert.assertEquals(task.getId(), task2.getId());
-			Assert.assertEquals(((CronTimer)task.getTrigger()).getExpression(), ((CronTimer)task2.getTrigger()).getExpression());
 			System.out.println("\n==========================================\n");
 		}
 	}
