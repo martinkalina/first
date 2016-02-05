@@ -2,23 +2,16 @@ package cz.jpower8.scheduler;
 
 import javax.xml.bind.JAXBException;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.thoughtworks.xstream.XStream;
 
-import cz.jpower8.scheduler.model.CronTimer;
-import cz.jpower8.scheduler.model.LocalFileExist;
 import cz.jpower8.scheduler.model.Task;
-import cz.jpower8.scheduler.model.True;
+import cz.jpower8.scheduler.model.trigger.CronTimer;
 
 public class TestXstreamConfig {
 
-	@After
-	public void shutdown(){
-		System.out.println("\n==========================================\n");
-	}
 	@Test
 	public void testMarshaller() throws Exception {
 		for (Task task : TaskRepository.TASKS) {
@@ -27,6 +20,7 @@ public class TestXstreamConfig {
 			Task task2 = unmarshall(xml);
 			Assert.assertEquals(task.getId(), task2.getId());
 			Assert.assertEquals(((CronTimer)task.getTrigger()).getExpression(), ((CronTimer)task2.getTrigger()).getExpression());
+			System.out.println("\n==========================================\n");
 		}
 	}
 

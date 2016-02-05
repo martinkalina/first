@@ -1,8 +1,11 @@
-package cz.jpower8.scheduler.model;
+package cz.jpower8.scheduler.model.condition;
 
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
+
+import cz.jpower8.scheduler.model.AbstractConditionContainer;
+import cz.jpower8.scheduler.model.ICondition;
 
 public class Or extends AbstractConditionContainer implements ICondition {
 

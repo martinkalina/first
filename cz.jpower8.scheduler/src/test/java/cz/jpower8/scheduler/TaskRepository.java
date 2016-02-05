@@ -3,11 +3,12 @@ package cz.jpower8.scheduler;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import cz.jpower8.scheduler.model.And;
-import cz.jpower8.scheduler.model.CronTimer;
-import cz.jpower8.scheduler.model.LocalFileExist;
-import cz.jpower8.scheduler.model.Not;
+import cz.jpower8.scheduler.model.AbstractTimer;
 import cz.jpower8.scheduler.model.Task;
+import cz.jpower8.scheduler.model.condition.And;
+import cz.jpower8.scheduler.model.condition.LocalFileExist;
+import cz.jpower8.scheduler.model.condition.Not;
+import cz.jpower8.scheduler.model.trigger.CronTimer;
 
 public class TaskRepository {
 
@@ -17,7 +18,7 @@ public class TaskRepository {
 		
 		Task task = new Task();
 		task.setId("simple_task");
-		CronTimer timer = new CronTimer("*/5 * * ? * *");
+		AbstractTimer timer = new CronTimer("*/5 * * ? * *");
 		task.setTrigger(timer);
 		task.setJobClass(HelloJob.class.getName());
 		TASKS.add(task);

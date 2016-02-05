@@ -1,6 +1,8 @@
-package cz.jpower8.scheduler.model;
+package cz.jpower8.scheduler.model.condition;
 
 import java.io.File;
+
+import cz.jpower8.scheduler.model.ICondition;
 
 public class LocalFileExist implements ICondition {
 

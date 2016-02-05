@@ -1,4 +1,6 @@
-package cz.jpower8.scheduler.model;
+package cz.jpower8.scheduler.model.condition;
+
+import cz.jpower8.scheduler.model.ICondition;
 
 public class Not implements ICondition {
 	

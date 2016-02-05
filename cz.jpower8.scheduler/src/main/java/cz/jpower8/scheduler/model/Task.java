@@ -2,6 +2,8 @@ package cz.jpower8.scheduler.model;
 
 import javax.xml.bind.annotation.XmlElementRef;
 
+import cz.jpower8.scheduler.model.condition.True;
+
 public class Task {
 	
 	private String id;
