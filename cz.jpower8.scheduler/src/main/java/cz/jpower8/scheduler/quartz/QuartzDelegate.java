@@ -2,6 +2,9 @@ package cz.jpower8.scheduler.quartz;
 
 import static org.quartz.JobBuilder.newJob;
 
+import java.util.Calendar;
+import java.util.Collection;
+
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -15,6 +18,8 @@ import org.quartz.plugins.management.ShutdownHookPlugin;
 
 import cz.jpower8.scheduler.IScheduler;
 import cz.jpower8.scheduler.model.Task;
+import cz.jpower8.scheduler.model.calendar.AnnualCalendar;
+import cz.jpower8.scheduler.model.calendar.CalendarDate;
 
 public class QuartzDelegate implements IScheduler {
 
@@ -90,6 +95,24 @@ public class QuartzDelegate implements IScheduler {
 	
 	public Scheduler getQuartz() {
 		return quartz;
+	}
+
+	public void addCalendar(AnnualCalendar calendar) {
+		Collection<CalendarDate> dates = calendar.getDates();
+		org.quartz.impl.calendar.AnnualCalendar qc = new org.quartz.impl.calendar.AnnualCalendar();
+		for (CalendarDate calendarDate : dates) {
+			Calendar day =  Calendar.getInstance();
+			day.set(Calendar.DAY_OF_MONTH, calendarDate.getDay());
+			day.set(Calendar.MONTH, calendarDate.getMonth() - 1);
+			qc.setDayExcluded(day , calendar.isExclude());
+		}
+		
+		try {
+			quartz.addCalendar(calendar.getName(), qc, true, true);
+		} catch (SchedulerException e) {
+			throw new RuntimeException(e);
+		}
+		
 	}
 
 }

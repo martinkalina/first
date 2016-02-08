@@ -3,10 +3,11 @@ package cz.jpower8.scheduler.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public abstract class AbstractConditionContainer implements ICondition {
 
-	private final Collection<ICondition> children = new ArrayList<ICondition>();
+	private final List<ICondition> children = new ArrayList<ICondition>();
 	
 	public AbstractConditionContainer(){
 	}

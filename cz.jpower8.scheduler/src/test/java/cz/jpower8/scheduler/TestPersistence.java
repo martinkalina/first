@@ -10,13 +10,29 @@ import cz.jpower8.scheduler.quartz.QuartzDelegate;
 public class TestPersistence {
 
 	
+	
+	
+	@Test
+	public void testCounter() throws InterruptedException, SchedulerException {
+		QuartzDelegate quartzDelegate = new QuartzDelegate();
+		Task task = new Task("counter test");
+		task.setJobClass(CountingJob.class.getName());
+		task.setTrigger(new SimpleTimer(5, 0));
+		quartzDelegate.schedule(task);
+		
+		quartzDelegate.start();
+		
+		Thread.sleep(5 * 1000);
+	}
+	
+	
 	@Test
 	public void testPersistence1() throws InterruptedException, SchedulerException {
 		QuartzDelegate quartzDelegate = new QuartzDelegate("quartz-jdbc-store.properties");
 		quartzDelegate.getQuartz().clear(); // persistent quartz must be cleared
 		Task task = new Task("persistent");
 		task.setJobClass(CountingJob.class.getName());
-		task.setTrigger(new SimpleTimer(5, 5));
+		task.setTrigger(new SimpleTimer(3, 2));
 		quartzDelegate.schedule(task);
 		
 		quartzDelegate.start();
@@ -30,7 +46,7 @@ public class TestPersistence {
 		QuartzDelegate quartzDelegate = new QuartzDelegate("quartz-jdbc-store.properties");
 		quartzDelegate.start();
 		// run  4 remaining rounds
-		Thread.sleep(1000*30);
+		Thread.sleep(1000*10);
 	}
 
 }

@@ -36,7 +36,7 @@ public class TestSchedule {
 		quartzDelegate.schedule(task);
 		
 		quartzDelegate.start();
-		Thread.sleep(1000*60);
+		Thread.sleep(1000*10);
 		
 	}
 	
