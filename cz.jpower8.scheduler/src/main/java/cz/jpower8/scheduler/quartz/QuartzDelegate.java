@@ -5,6 +5,7 @@ import static org.quartz.JobBuilder.newJob;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -23,6 +24,10 @@ public class QuartzDelegate implements IScheduler {
 
 	
 	public QuartzDelegate() {
+		init();
+	}
+
+	private void init() {
 		try {
 			quartz = StdSchedulerFactory.getDefaultScheduler();
 			new ShutdownHookPlugin().initialize("shutdown hook", quartz, null);
@@ -31,16 +36,28 @@ public class QuartzDelegate implements IScheduler {
 		}
 	}
 
+	public QuartzDelegate(String propertiesPath) {
+		System.setProperty(org.quartz.impl.StdSchedulerFactory.PROPERTIES_FILE, propertiesPath);
+		init();
+	}
+
 	@Override
 	public void schedule(final Task task) {
 		
 		try {
 			@SuppressWarnings("unchecked")
 			Class<? extends Job> clazz = (Class<? extends Job>) Class.forName(task.getJobClass());
-			final JobDetail jobDetail = newJob(clazz).withIdentity(task.getId())
-					.storeDurably()
-					.build();
-			quartz.addJob(jobDetail, true);
+			final JobKey jobKey = JobKey.jobKey(task.getId());
+			
+			JobDetail jobDetail;
+			if (quartz.getJobDetail(jobKey) != null){
+				jobDetail = quartz.getJobDetail(jobKey) ;
+			}  else {
+				jobDetail = newJob(clazz).withIdentity(jobKey)
+						.storeDurably()
+						.build();
+				quartz.addJob(jobDetail, false);
+			}
 			quartz.getListenerManager().addTriggerListener(new TriggerListenerSupport() {
 				@Override
 				public String getName() {
@@ -48,7 +65,7 @@ public class QuartzDelegate implements IScheduler {
 				}
 				@Override
 				public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
-					boolean jobFound = context.getJobDetail().equals(jobDetail);
+					boolean jobFound = context.getJobDetail().getKey().equals(jobKey);
 					boolean condition = task.getCondition().evaluate();
 					return jobFound && !condition;
 				}
