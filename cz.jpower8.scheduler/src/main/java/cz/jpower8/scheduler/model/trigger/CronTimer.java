@@ -1,22 +1,27 @@
 package cz.jpower8.scheduler.model.trigger;
 
-import javax.xml.bind.annotation.XmlElement;
-
+import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.ScheduleBuilder;
 import org.quartz.Trigger;
 
 import cz.jpower8.scheduler.model.AbstractTimer;
 
+/**
+ * Uses Cron-like expression. It's using quartz cron expression implementation.
+ * 
+ * @see CronExpression
+ * @author Martin Kalina
+ *
+ */
 public class CronTimer extends AbstractTimer {
 
 	private String expression;
-	public CronTimer(){
-	}
+
 	public CronTimer(String expression){
 		this.expression = expression;
 	}
-	@XmlElement
+	
 	public String getExpression() {
 		return expression;
 	}

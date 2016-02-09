@@ -14,6 +14,12 @@ import org.slf4j.LoggerFactory;
 import cz.jpower8.scheduler.IScheduler;
 import cz.jpower8.scheduler.quartz.QuartzDelegate;
 
+/**
+ * Base class for Quartz time-based triggers.
+ * 
+ * @author Martin Kalina
+ *
+ */
 public abstract class AbstractTimer implements ITrigger {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractTimer.class);
@@ -34,12 +40,12 @@ public abstract class AbstractTimer implements ITrigger {
 			try {
 				Date date = ((QuartzDelegate) scheduler).getQuartz().scheduleJob(trigger);
 				log.debug("Task '{}' time scheduled, next run on {}", taskId, date);
-				return ;
 			} catch (SchedulerException e) {
 				throw new RuntimeException(e);
 			}
+		} else {
+			throw new IllegalArgumentException("Unknown scheduler type: " + scheduler.getClass().getName());
 		}
-		throw new IllegalArgumentException("Unknown scheduler type: " + scheduler.getClass());
 	}
 
 	protected abstract ScheduleBuilder<? extends Trigger> createTimeSchedule();
@@ -48,6 +54,11 @@ public abstract class AbstractTimer implements ITrigger {
 		return calendarName;
 	}
 
+	/**
+	 * Links to defined calendar.
+	 * 
+	 * @param calendarName
+	 */
 	public void setCalendarName(String calendarName) {
 		this.calendarName = calendarName;
 	}

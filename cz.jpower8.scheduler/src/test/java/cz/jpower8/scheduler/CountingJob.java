@@ -13,18 +13,18 @@ public class CountingJob implements Job {
 
 	private static final Logger log = LoggerFactory.getLogger(CountingJob.class);
 	
-	private static final String COUNTING_JOB_TIMER = "counting-job-timer";
+	public static final String COUNTING_JOB_COUNTER = "counting-job-counter";
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
 		int count;
-		if (jobDataMap.containsKey(COUNTING_JOB_TIMER)){
-			count = jobDataMap.getInt(COUNTING_JOB_TIMER);
+		if (jobDataMap.containsKey(COUNTING_JOB_COUNTER)){
+			count = jobDataMap.getInt(COUNTING_JOB_COUNTER);
 		} else {
 			count = 0;
 		}
 		log.info("Execution no.: " + count++);
-		jobDataMap.put(COUNTING_JOB_TIMER, count);
+		jobDataMap.put(COUNTING_JOB_COUNTER, count);
 	}
 
 }

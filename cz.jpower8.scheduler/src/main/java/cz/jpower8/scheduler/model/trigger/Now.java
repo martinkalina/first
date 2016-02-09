@@ -6,6 +6,12 @@ import org.quartz.Trigger;
 
 import cz.jpower8.scheduler.model.AbstractTimer;
 
+/**
+ * Triggers the job instantly.
+ * 
+ * @author Martin Kalina
+ *
+ */
 public class Now extends AbstractTimer {
 
 	@Override

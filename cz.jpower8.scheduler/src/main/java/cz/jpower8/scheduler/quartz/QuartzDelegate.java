@@ -21,6 +21,12 @@ import cz.jpower8.scheduler.model.Task;
 import cz.jpower8.scheduler.model.calendar.AnnualCalendar;
 import cz.jpower8.scheduler.model.calendar.CalendarDate;
 
+/**
+ * Scheduler implementation based on Quartz scheduler.
+ *  
+ * @author Martin Kalina
+ *
+ */
 public class QuartzDelegate implements IScheduler {
 
 //	private static final Logger log = LoggerFactory.getLogger(QuartzDelegate.class);
@@ -30,6 +36,11 @@ public class QuartzDelegate implements IScheduler {
 	
 	public QuartzDelegate() {
 		init();
+		try {
+			quartz.clear();// when no persistence is used, clear (for test purposes mainly)
+		} catch (SchedulerException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private void init() {
@@ -50,33 +61,27 @@ public class QuartzDelegate implements IScheduler {
 	public void schedule(final Task task) {
 		
 		try {
-			@SuppressWarnings("unchecked")
-			Class<? extends Job> clazz = (Class<? extends Job>) Class.forName(task.getJobClass());
 			final JobKey jobKey = JobKey.jobKey(task.getId());
-			
 			JobDetail jobDetail;
 			if (quartz.getJobDetail(jobKey) != null){
+				// if the job was persisted and we are recovering from system crash, just load the job, and add the listener
 				jobDetail = quartz.getJobDetail(jobKey) ;
 			}  else {
+				// add the new job
+				@SuppressWarnings("unchecked")
+				Class<? extends Job> clazz = (Class<? extends Job>) Class.forName(task.getJobClass());
 				jobDetail = newJob(clazz).withIdentity(jobKey)
 						.storeDurably()
 						.build();
 				quartz.addJob(jobDetail, false);
 			}
-			quartz.getListenerManager().addTriggerListener(new TriggerListenerSupport() {
-				@Override
-				public String getName() {
-					return "Condition Evaluator";
-				}
-				@Override
-				public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
-					boolean jobFound = context.getJobDetail().getKey().equals(jobKey);
-					boolean condition = task.getCondition().evaluate();
-					return jobFound && !condition;
-				}
-			});
-			
+
+			// add listener for evaluating the condition before launch the job
+			quartz.getListenerManager().addTriggerListener(new ConditionEvaluator(task));
+
+			// register the trigger
 			task.getTrigger().register(this, task.getId());
+			
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException("Cant load job class", e);
 		} catch (SchedulerException e) {
@@ -85,6 +90,27 @@ public class QuartzDelegate implements IScheduler {
 	}
 
 
+	private final class ConditionEvaluator extends TriggerListenerSupport {
+		private Task task;
+	
+		private ConditionEvaluator(Task task) {
+			this.task = task;
+		}
+	
+		@Override
+		public String getName() {
+			return "Condition Evaluator for " + task.getId();
+		}
+	
+		@Override
+		public boolean vetoJobExecution(Trigger trigger, JobExecutionContext context) {
+			boolean jobFound = context.getJobDetail().getKey().equals(JobKey.jobKey(task.getId()));
+			boolean condition = task.getCondition().evaluate();
+			return jobFound && !condition;
+		}
+	}
+	
+	@Override
 	public void start() {
 		try {
 			quartz.start();
@@ -113,6 +139,15 @@ public class QuartzDelegate implements IScheduler {
 			throw new RuntimeException(e);
 		}
 		
+	}
+
+	@Override
+	public void shutDown() {
+		try {
+			quartz.shutdown();
+		} catch (SchedulerException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

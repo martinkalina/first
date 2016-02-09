@@ -4,6 +4,12 @@ import java.io.File;
 
 import cz.jpower8.scheduler.model.ICondition;
 
+/**
+ * Checks for local file.
+ * 
+ * @author Martin Kalina
+ *
+ */
 public class LocalFileExist implements ICondition {
 
 	private String path;

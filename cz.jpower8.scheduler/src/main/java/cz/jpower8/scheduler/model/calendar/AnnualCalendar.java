@@ -3,6 +3,12 @@ package cz.jpower8.scheduler.model.calendar;
 import java.util.Collection;
 import java.util.HashSet;
 
+/**
+ * This is calendar to typically exclude some dates during each year.
+ *  
+ * @author Martin Kalina
+ *
+ */
 public class AnnualCalendar {
 	
 	private String name;

@@ -20,6 +20,12 @@ import cz.jpower8.scheduler.IScheduler;
 import cz.jpower8.scheduler.model.AbstractEvent;
 import cz.jpower8.scheduler.quartz.QuartzDelegate;
 
+/**
+ * Event fired on execution of some other task. 
+ * Could optionally fire on success/failure only, and with interval delay. 
+ * @author Martin Kalina
+ *
+ */
 public class OnTaskExecuted extends AbstractEvent {
 
 	public static enum Mode{ALWAYS, ON_SUCCESS, ON_FAILURE}
@@ -32,8 +38,6 @@ public class OnTaskExecuted extends AbstractEvent {
 		taskId = taskToListen;
 	}
 	
-	public OnTaskExecuted() {
-	}
 
 	@Override
 	public void register(IScheduler scheduler, final String taskId) {
@@ -81,6 +85,8 @@ public class OnTaskExecuted extends AbstractEvent {
 				throw new RuntimeException(e);
 			}
 			
+		} else {
+			throw new IllegalArgumentException("Unknown scheduler type: " + scheduler.getClass().getName());
 		}
 		
 	}

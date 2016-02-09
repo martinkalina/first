@@ -6,13 +6,17 @@ import org.quartz.Trigger;
 
 import cz.jpower8.scheduler.model.AbstractTimer;
 
+/**
+ * Timer capable of repeatable triggering  with defined interval and optional count.
+ * @author Martin Kalina
+ *
+ */
 public class SimpleTimer extends AbstractTimer {
 
 	private int intervalSeconds;
 	private int repeatCount;
 	
 	public SimpleTimer(int intervalSeconds, int repeatCount) {
-		super();
 		this.intervalSeconds = intervalSeconds;
 		this.repeatCount = repeatCount;
 	}

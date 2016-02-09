@@ -9,8 +9,6 @@ public abstract class AbstractConditionContainer implements ICondition {
 
 	private final List<ICondition> children = new ArrayList<ICondition>();
 	
-	public AbstractConditionContainer(){
-	}
 	public AbstractConditionContainer(ICondition ... children){
 		add(children);
 	}

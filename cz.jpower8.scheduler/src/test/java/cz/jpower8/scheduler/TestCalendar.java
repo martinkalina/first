@@ -1,15 +1,14 @@
 package cz.jpower8.scheduler;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.quartz.SchedulerException;
 
-import com.thoughtworks.xstream.XStream;
-
-import cz.jpower8.scheduler.configuration.xml.CalendarDateConverter;
-import cz.jpower8.scheduler.configuration.xml.XmlCalendarFactroy;
+import cz.jpower8.scheduler.configuration.xml.XmlTaskSerializer;
 import cz.jpower8.scheduler.model.AbstractTimer;
 import cz.jpower8.scheduler.model.Task;
 import cz.jpower8.scheduler.model.calendar.AnnualCalendar;
@@ -17,31 +16,39 @@ import cz.jpower8.scheduler.model.calendar.CalendarDate;
 import cz.jpower8.scheduler.model.trigger.CronTimer;
 import cz.jpower8.scheduler.quartz.QuartzDelegate;
 
-public class TestCalendar {
+public class TestCalendar extends JobTestSupport {
 
-	private static final String CZECH_HOLIDAYS = "czech-holidays";
 
 	
 	@Test
 	public void testAnnual() throws SchedulerException, InterruptedException {
 		QuartzDelegate quartzDelegate = new QuartzDelegate();
-		quartzDelegate.addCalendar(createTestCalendar());
+		String name = "test-calendar";
+		//create calendar with current and next date
+		AnnualCalendar calendar = createTestCalendar(name);
+		quartzDelegate.addCalendar(calendar);
 		Task task = new Task("calendar-task");
-		task.setJobClass(HelloJob.class.getName());
+		task.setJobClass(JobTestSupport.class.getName());
 		AbstractTimer st = new CronTimer("*/2 * * ? * *");
-		st.setCalendarName(CZECH_HOLIDAYS);
+		st.setCalendarName(name);
 		task.setTrigger(st);
 		quartzDelegate.schedule(task);
 		quartzDelegate.start();
-		Thread.sleep(1000*5);
+		Thread.sleep(1000 * 2);
+		//asssert task is not executed
+		Assert.assertEquals(0, getExecuted());
 	}
 
 
-	private cz.jpower8.scheduler.model.calendar.AnnualCalendar createTestCalendar() {
-		cz.jpower8.scheduler.model.calendar.AnnualCalendar myCal = new cz.jpower8.scheduler.model.calendar.AnnualCalendar(CZECH_HOLIDAYS);
+	private cz.jpower8.scheduler.model.calendar.AnnualCalendar createTestCalendar(String name) {
+		AnnualCalendar myCal = new AnnualCalendar(name);
 		Calendar c = GregorianCalendar.getInstance();
 		int d = c.get(Calendar.DAY_OF_MONTH);
 		int m = c.get(Calendar.MONTH) + 1;
+		myCal.addDate(new CalendarDate(m, d));
+		c.add(Calendar.DATE, 1);
+		d = c.get(Calendar.DAY_OF_MONTH);
+		m = c.get(Calendar.MONTH) + 1;
 		myCal.addDate(new CalendarDate(m, d));
 		return myCal;
 	}
@@ -61,10 +68,9 @@ public class TestCalendar {
 		myCal.addDate(new CalendarDate(12, 24));
 		myCal.addDate(new CalendarDate(12, 25));
 		myCal.addDate(new CalendarDate(12, 26));
-		XStream xstream = new XmlCalendarFactroy().getXStream();
-		xstream.alias("date", CalendarDate.class);
-		xstream.registerConverter(new CalendarDateConverter());
-		System.out.println(xstream.toXML(myCal));
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		new XmlTaskSerializer().saveCalendar(myCal, baos);
+		System.out.println(baos.toString());
 	}
 
 }

@@ -1,5 +1,10 @@
 package cz.jpower8.scheduler.model.calendar;
 
+/**
+ * This represents a date in a year.
+ * @author Martin Kalina
+ *
+ */
 public class CalendarDate {
 	
 	private int month;
