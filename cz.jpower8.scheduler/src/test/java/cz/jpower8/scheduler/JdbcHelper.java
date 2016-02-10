@@ -12,18 +12,23 @@ public class JdbcHelper {
 	
 	private Connection connection;
 
-	public JdbcHelper() throws Exception {
-		Properties props = new Properties();
-		props.load(new FileInputStream("quartz-jdbc-store.properties"));
-		String driverClassname = props.getProperty("org.quartz.dataSource.myDS.driver");
-		String url = props.getProperty("org.quartz.dataSource.myDS.URL");
+	public JdbcHelper()  {
 		
-		Driver driver = (Driver) Class.forName(driverClassname).newInstance();
-		
-		Properties info = new Properties();
-		info.put("user", props.getProperty("org.quartz.dataSource.myDS.user"));
-		info.put("password", props.getProperty("org.quartz.dataSource.myDS.password"));
-		connection = driver.connect(url, info);
+		try {
+			Properties props = new Properties();
+			props.load(new FileInputStream("quartz-jdbc-store.properties"));
+			String driverClassname = props.getProperty("org.quartz.dataSource.myDS.driver");
+			String url = props.getProperty("org.quartz.dataSource.myDS.URL");
+			
+			Driver driver = (Driver) Class.forName(driverClassname).newInstance();
+			
+			Properties info = new Properties();
+			info.put("user", props.getProperty("org.quartz.dataSource.myDS.user"));
+			info.put("password", props.getProperty("org.quartz.dataSource.myDS.password"));
+			connection = driver.connect(url, info);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void createDb(){

@@ -1,6 +1,7 @@
 package cz.jpower8.scheduler;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.quartz.JobDataMap;
 import org.quartz.JobKey;
@@ -12,6 +13,14 @@ import cz.jpower8.scheduler.quartz.QuartzDelegate;
 
 public class TestDataPersistence {
 
+	@Before
+	public void init() {
+		JdbcHelper jdbcHelper = new JdbcHelper();
+		jdbcHelper.dropDb();
+		jdbcHelper.createDb();
+	}
+	
+	
 	@Test
 	public void testDataPersistence() throws InterruptedException, SchedulerException {
 		QuartzDelegate quartzDelegate = new QuartzDelegate("quartz-jdbc-store.properties");

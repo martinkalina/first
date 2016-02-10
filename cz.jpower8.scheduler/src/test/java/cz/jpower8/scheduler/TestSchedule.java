@@ -1,13 +1,18 @@
 package cz.jpower8.scheduler;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 import org.junit.Assert;
 import org.junit.Test;
+import org.quartz.TimeOfDay;
 import org.quartz.jobs.NoOpJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cz.jpower8.scheduler.model.Task;
 import cz.jpower8.scheduler.model.trigger.CronTimer;
+import cz.jpower8.scheduler.model.trigger.DayTimeIntervalTimer;
 import cz.jpower8.scheduler.model.trigger.Now;
 import cz.jpower8.scheduler.model.trigger.OnTaskExecuted;
 import cz.jpower8.scheduler.model.trigger.OnTaskExecuted.Mode;
@@ -36,6 +41,31 @@ public class TestSchedule extends JobTestSupport {
 		Thread.sleep(1000); // wait a second for ensure it will not repeat 2 times
 		Assert.assertEquals(2, getExecuted() );
 	}
+	
+	@Test
+	public void testDayTimeIntervalSchedule() throws InterruptedException {
+		IScheduler quartzDelegate = new QuartzDelegate();
+		Task task = new Task("daytime-interval");
+		task.setJobClass(getClass().getName());
+		DayTimeIntervalTimer trigger = new DayTimeIntervalTimer();
+		task.setTrigger(trigger);
+		Calendar c = GregorianCalendar.getInstance();
+		c.add(Calendar.SECOND, 2); // interval starting 2 seconds from now
+		trigger.setStartTimeOfDay(new TimeOfDay(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND)));
+		c.add(Calendar.SECOND, 4); // ending 4 seconds later (inclusive)
+		trigger.setEndTimeOfDay(new TimeOfDay(c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), c.get(Calendar.SECOND)));
+		trigger.setIntervalInSeconds(1);
+		quartzDelegate.schedule(task);
+		quartzDelegate.start();
+		Thread.sleep(100); // wait a tick, it should not execute for a second 
+		Assert.assertEquals(0, getExecuted() );
+		Thread.sleep(6*1000); // wait 6 seconds to be sure 
+		Assert.assertEquals(5, getExecuted() );
+		Thread.sleep(1000); // wait a second for ensure it will not repeat
+		Assert.assertEquals(5, getExecuted() );
+	}
+	
+	
 	
 	@Test
 	public void testCronSchedule() throws InterruptedException {

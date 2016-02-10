@@ -4,6 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import cz.jpower8.scheduler.model.Task;
 import cz.jpower8.scheduler.model.trigger.Now;
@@ -15,11 +17,14 @@ import cz.jpower8.scheduler.quartz.QuartzDelegate;
  */
 public class TestRecovery extends JobTestSupport {
 
+	private static final Logger log =  LoggerFactory.getLogger(TestRecovery.class);
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
 		super.execute(context);
 		try {
+			log.info("Start sleeping in task thread before finsh...");
 			Thread.sleep(1000);
+			log.info("Task finished");
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
@@ -36,8 +41,11 @@ public class TestRecovery extends JobTestSupport {
 		task.setJobClass(getClass().getName());
 		task.setTrigger(new Now());
 		quartzDelegate.schedule(task);
+		log.info("Task scheduled");
 		quartzDelegate.start();
+		log.info("Scheduler started");
 		Thread.sleep(500);
+		log.info("System shutdown initiated");
 		System.exit(0);
 		// run, but shut down during execution
 	}
