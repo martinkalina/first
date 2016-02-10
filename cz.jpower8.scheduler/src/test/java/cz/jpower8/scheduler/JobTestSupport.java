@@ -22,7 +22,7 @@ public abstract class JobTestSupport implements Job {
 	private static final AtomicInteger executed = new AtomicInteger();
 
 	@Override
-	public final void execute(JobExecutionContext context) throws JobExecutionException {
+	public void execute(JobExecutionContext context) throws JobExecutionException {
 		log.info("Test Task executed, count:" + executed.incrementAndGet());
 	}
 

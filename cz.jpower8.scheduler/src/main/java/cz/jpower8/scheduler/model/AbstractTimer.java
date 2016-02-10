@@ -5,9 +5,11 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import java.util.Date;
 
 import org.quartz.ScheduleBuilder;
+import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
+import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,16 +32,21 @@ public abstract class AbstractTimer implements ITrigger {
 	@Override
 	public void register(IScheduler scheduler, String taskId) {
 		if (scheduler instanceof QuartzDelegate){
-			ScheduleBuilder<?> schedule = createTimeSchedule();
-			TriggerBuilder<?> withSchedule = newTrigger().forJob(taskId)
-					.withIdentity(taskId).withSchedule(schedule);
-			if (calendarName != null){
-				withSchedule.modifiedByCalendar(calendarName);
-			}
-			Trigger trigger = withSchedule.build();
+			Scheduler quartz = ((QuartzDelegate) scheduler).getQuartz();
 			try {
-				Date date = ((QuartzDelegate) scheduler).getQuartz().scheduleJob(trigger);
-				log.debug("Task '{}' time scheduled, next run on {}", taskId, date);
+				Trigger trigger = quartz.getTrigger(TriggerKey.triggerKey(taskId));
+				if (trigger == null){ // only trigger and schedule when no trigger found 
+					ScheduleBuilder<?> schedule = createTimeSchedule();
+					
+					TriggerBuilder<?> withSchedule = newTrigger().forJob(taskId)
+							.withIdentity(taskId).withSchedule(schedule);
+					if (calendarName != null){
+						withSchedule.modifiedByCalendar(calendarName);
+					}
+					trigger = withSchedule.build();
+					Date date = quartz.scheduleJob(trigger);
+					log.debug("Task '{}' time scheduled, next run on {}", taskId, date);
+				}
 			} catch (SchedulerException e) {
 				throw new RuntimeException(e);
 			}

@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Collection;
 
 import org.quartz.Job;
+import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
@@ -46,7 +47,9 @@ public class QuartzDelegate implements IScheduler {
 	private void init() {
 		try {
 			quartz = StdSchedulerFactory.getDefaultScheduler();
-			new ShutdownHookPlugin().initialize("shutdown hook", quartz, null);
+			ShutdownHookPlugin shutdownHookPlugin = new ShutdownHookPlugin();
+			shutdownHookPlugin.setCleanShutdown(false);
+			shutdownHookPlugin.initialize("shutdown hook", quartz, null);
 		} catch (SchedulerException e) {
 			throw new RuntimeException(e);
 		}
@@ -61,6 +64,7 @@ public class QuartzDelegate implements IScheduler {
 	public void schedule(final Task task) {
 		
 		try {
+			
 			final JobKey jobKey = JobKey.jobKey(task.getId());
 			JobDetail jobDetail;
 			if (quartz.getJobDetail(jobKey) != null){
@@ -70,8 +74,12 @@ public class QuartzDelegate implements IScheduler {
 				// add the new job
 				@SuppressWarnings("unchecked")
 				Class<? extends Job> clazz = (Class<? extends Job>) Class.forName(task.getJobClass());
-				jobDetail = newJob(clazz).withIdentity(jobKey)
-						.storeDurably()
+				JobBuilder jobBuilder = newJob(clazz).withIdentity(jobKey)
+						.storeDurably();
+				if (task.isRecovery()){
+					jobBuilder.requestRecovery(true);
+				}
+				jobDetail = jobBuilder
 						.build();
 				quartz.addJob(jobDetail, false);
 			}

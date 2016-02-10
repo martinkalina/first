@@ -19,6 +19,7 @@ public class Task {
 	private String id;
 	private ITrigger trigger ;
 	private ICondition condition = new True();
+	private boolean recovery;
 
 	private String jobClass;
 
@@ -57,6 +58,16 @@ public class Task {
 
 	public void setJobClass(String jobClass) {
 		this.jobClass = jobClass;
+	}
+
+
+	public boolean isRecovery() {
+		return recovery;
+	}
+
+
+	public void setRecovery(boolean recovery) {
+		this.recovery = recovery;
 	}
 
 }
