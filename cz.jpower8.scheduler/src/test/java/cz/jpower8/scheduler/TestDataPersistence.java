@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 
@@ -12,6 +13,11 @@ import cz.jpower8.scheduler.model.trigger.SimpleTimer;
 import cz.jpower8.scheduler.quartz.QuartzDelegate;
 
 public class TestDataPersistence {
+
+	private static final String TASK_NAME = "counting";
+
+	private static final String TASK_DESCRIPTION = "This is a task for testing data persistence.";
+
 
 	@Before
 	public void init() {
@@ -23,26 +29,32 @@ public class TestDataPersistence {
 	
 	@Test
 	public void testDataPersistence() throws InterruptedException, SchedulerException {
-		QuartzDelegate quartzDelegate = new QuartzDelegate("quartz-jdbc-store.properties");
-		quartzDelegate.getQuartz().clear(); // persistent quartz must be cleared
-		Task task = new Task("counting");
+		QuartzDelegate quartz1 = new QuartzDelegate("quartz-jdbc-store.properties");
+		quartz1.getQuartz().clear(); // persistent quartz must be cleared
+		Task task = new Task(TASK_NAME);
+		task.setDescription(TASK_DESCRIPTION);
 		task.setJobClass(CountingJob.class.getName());
 		task.setTrigger(new SimpleTimer(2, 2));
-		quartzDelegate.schedule(task);
-		quartzDelegate.start();
+		quartz1.schedule(task);
+		quartz1.start();
 		//just run once, then shutdown
 		Thread.sleep(100);
-		JobDataMap jobDataMap = quartzDelegate.getQuartz().getJobDetail(JobKey.jobKey("counting")).getJobDataMap();
-		int storedCount = jobDataMap.getInt(CountingJob.COUNTING_JOB_COUNTER);
+		JobDetail jobDetail = quartz1.getQuartz().getJobDetail(JobKey.jobKey(TASK_NAME));
+		JobDataMap jobDataMap = jobDetail.getJobDataMap();
+		int storedCount = jobDataMap.getInt(CountingJob.JOB_COUNTER);
 		Assert.assertEquals(1, storedCount);
-		quartzDelegate.shutDown();
+		quartz1.shutDown(); // cannot be used anymore
 		
 		//create new
-		quartzDelegate = new QuartzDelegate("quartz-jdbc-store.properties");
-		quartzDelegate.start(); //should run 'persistent' task 2 more times
+		QuartzDelegate quartz2 = new QuartzDelegate("quartz-jdbc-store.properties");
+		Assert.assertNotEquals(quartz2, quartz1); // must not return same object
+		quartz2.start(); //should run 'persistent' task 2 more times
 		Thread.sleep(4000);
-		jobDataMap = quartzDelegate.getQuartz().getJobDetail(JobKey.jobKey("counting")).getJobDataMap();
-		storedCount = jobDataMap.getInt(CountingJob.COUNTING_JOB_COUNTER);
+		JobDetail jobDetail2 = quartz2.getQuartz().getJobDetail(JobKey.jobKey(TASK_NAME));
+		String description2 = jobDetail2.getDescription();
+		Assert.assertEquals(TASK_DESCRIPTION, description2);
+		JobDataMap jobDataMap2 = jobDetail2.getJobDataMap();
+		storedCount = jobDataMap2.getInt(CountingJob.JOB_COUNTER);
 		Assert.assertEquals(3, storedCount);
 	}
 

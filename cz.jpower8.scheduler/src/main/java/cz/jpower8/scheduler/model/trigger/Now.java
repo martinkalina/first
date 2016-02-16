@@ -16,7 +16,13 @@ public class Now extends AbstractTimer {
 
 	@Override
 	protected ScheduleBuilder<? extends Trigger> createTimeSchedule() {
-		return SimpleScheduleBuilder.simpleSchedule();
+		SimpleScheduleBuilder simpleSchedule = SimpleScheduleBuilder.simpleSchedule();
+		if (isFireImmediateAfterMisfire()){
+			simpleSchedule.withMisfireHandlingInstructionNowWithExistingCount();
+		} else {
+			simpleSchedule.withMisfireHandlingInstructionNextWithRemainingCount();
+		}
+		return simpleSchedule;
 	}
 
 }

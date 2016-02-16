@@ -5,11 +5,13 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TestCalendar.class, 
-				TestDataPersistence.class, 
-				TestSchedule.class, 
+@SuiteClasses({ TestSchedule.class, 
+				TestConditions.class,
 				TestSchedulePersistence.class, 
-				TestConditions.class
+				TestDataPersistence.class,
+				TestCalendar.class, 
+				TestManagingJobs.class,
+				TestMisfires.class
 				})
 public class AllTests {
 

@@ -30,6 +30,11 @@ public class SimpleTimer extends AbstractTimer {
 		SimpleScheduleBuilder simpleSchedule = SimpleScheduleBuilder.simpleSchedule();
 		simpleSchedule.withIntervalInSeconds(intervalSeconds);
 		simpleSchedule.withRepeatCount(repeatCount);
+		if (isFireImmediateAfterMisfire()){
+			simpleSchedule.withMisfireHandlingInstructionNowWithExistingCount();
+		} else {
+			simpleSchedule.withMisfireHandlingInstructionNextWithRemainingCount();
+		}
 		return simpleSchedule;
 	}
 

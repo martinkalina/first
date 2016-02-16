@@ -26,8 +26,8 @@ public abstract class AbstractTimer implements ITrigger {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractTimer.class);
 	private String calendarName;
-	
-	
+	private Date startTime;
+	private boolean fireImmediateAfterMisfire = false;
 	
 	@Override
 	public void register(IScheduler scheduler, String taskId) {
@@ -38,12 +38,15 @@ public abstract class AbstractTimer implements ITrigger {
 				if (trigger == null){ // only trigger and schedule when no trigger found 
 					ScheduleBuilder<?> schedule = createTimeSchedule();
 					
-					TriggerBuilder<?> withSchedule = newTrigger().forJob(taskId)
+					TriggerBuilder<?> triggerBuilder = newTrigger().forJob(taskId)
 							.withIdentity(taskId).withSchedule(schedule);
 					if (calendarName != null){
-						withSchedule.modifiedByCalendar(calendarName);
+						triggerBuilder.modifiedByCalendar(calendarName);
 					}
-					trigger = withSchedule.build();
+					if (startTime != null){
+						triggerBuilder.startAt(startTime);
+					}
+					trigger = triggerBuilder.build();
 					Date date = quartz.scheduleJob(trigger);
 					log.debug("Task '{}' time scheduled, next run on {}", taskId, date);
 				}
@@ -68,6 +71,29 @@ public abstract class AbstractTimer implements ITrigger {
 	 */
 	public void setCalendarName(String calendarName) {
 		this.calendarName = calendarName;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
+	}
+
+	public boolean isFireImmediateAfterMisfire() {
+		return fireImmediateAfterMisfire;
+	}
+	
+	/**
+	 * For any scheduled timer, when missfire (=missed fire time) occurred, 
+	 * we can fire the job immediately, or on next regular schedule(default).
+	 * This somehow simplifies the rules available in Quartz, but should be enough.
+	 * 
+	 * @param fireImmediateAfterMisfire
+	 */
+	public void setFireImmediateAfterMisfire(boolean fireImmediateAfterMisfire) {
+		this.fireImmediateAfterMisfire = fireImmediateAfterMisfire;
 	}
 	
 

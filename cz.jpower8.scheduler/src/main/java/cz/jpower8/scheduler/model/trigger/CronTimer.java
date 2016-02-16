@@ -30,7 +30,13 @@ public class CronTimer extends AbstractTimer {
 		this.expression = cronExpression;
 	}
 	protected ScheduleBuilder<? extends Trigger> createTimeSchedule() {
-		return CronScheduleBuilder.cronSchedule(expression);
+		CronScheduleBuilder builder = CronScheduleBuilder.cronSchedule(expression);
+		if (isFireImmediateAfterMisfire()){
+			builder.withMisfireHandlingInstructionFireAndProceed();
+		} else {
+			builder.withMisfireHandlingInstructionDoNothing();
+		}
+		return builder;
 	}
 	
 }

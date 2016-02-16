@@ -1,5 +1,10 @@
 package cz.jpower8.scheduler.model;
 
+import java.io.Serializable;
+import java.util.HashMap;
+
+import org.quartz.JobDetail;
+
 import cz.jpower8.scheduler.model.condition.True;
 
 
@@ -17,11 +22,13 @@ import cz.jpower8.scheduler.model.condition.True;
 public class Task {
 	
 	private String id;
+	private String description;
 	private ITrigger trigger ;
 	private ICondition condition = new True();
 	private boolean recovery;
 
 	private String jobClass;
+	private HashMap<String, Serializable> jobData = new HashMap<String, Serializable>();
 
 	public Task(String id) {
 		this.id = id;
@@ -65,9 +72,37 @@ public class Task {
 		return recovery;
 	}
 
-
+	/**
+	 * If set to true, the job is recovered once failed.
+	 * @see JobDetail#requestsRecovery()
+	 * @param recovery
+	 */
 	public void setRecovery(boolean recovery) {
 		this.recovery = recovery;
 	}
+
+
+	public String getDescription() {
+		return description;
+	}
+
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
+	public HashMap<String, Serializable> getJobData() {
+		return jobData;
+	}
+
+
+	public void setJobData(HashMap<String, Serializable>data){
+		this.jobData = data;
+	}
+
+
+	public void addParameter(String name, Serializable value) {
+		jobData.put(name, value);
+	};
 
 }

@@ -39,6 +39,11 @@ public class DayTimeIntervalTimer extends AbstractTimer {
 		if (daysOfWeek != null){
 			builder.onDaysOfTheWeek(daysOfWeek);
 		}
+		if (isFireImmediateAfterMisfire()){
+			builder.withMisfireHandlingInstructionFireAndProceed();
+		} else {
+			builder.withMisfireHandlingInstructionDoNothing();
+		}
 		return builder;
 	}
 
