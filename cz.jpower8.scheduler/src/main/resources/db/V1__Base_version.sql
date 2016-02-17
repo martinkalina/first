@@ -183,9 +183,8 @@ CREATE TABLE sched_task_history
   job_run_time bigint NOT NULL,
   failed boolean NOT NULL DEFAULT false,
   CONSTRAINT pk PRIMARY KEY (id)
-)
+);
 
 
 
 
-commit; 

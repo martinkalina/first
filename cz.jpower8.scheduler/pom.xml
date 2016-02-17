@@ -12,7 +12,27 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+				 	<driver>org.postgresql.Driver</driver>
+    				<url>jdbc:postgresql://localhost:5432/scheduler</url>
+					<user>scheduler</user>
+					<password>lopata</password>
+					<schemas>
+						<schema>scheduler</schema>
+					</schemas>
+					<locations>
+						<location>filesystem:src/main/resources/db/</location>
+					</locations>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
