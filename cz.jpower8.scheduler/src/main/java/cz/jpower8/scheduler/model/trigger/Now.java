@@ -20,7 +20,7 @@ public class Now extends AbstractTimer {
 		if (isFireImmediateAfterMisfire()){
 			simpleSchedule.withMisfireHandlingInstructionNowWithExistingCount();
 		} else {
-			simpleSchedule.withMisfireHandlingInstructionNextWithRemainingCount();
+			simpleSchedule.withMisfireHandlingInstructionNextWithExistingCount();
 		}
 		return simpleSchedule;
 	}

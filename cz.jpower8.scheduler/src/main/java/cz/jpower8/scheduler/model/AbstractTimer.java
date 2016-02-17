@@ -87,7 +87,8 @@ public abstract class AbstractTimer implements ITrigger {
 	
 	/**
 	 * For any scheduled timer, when missfire (=missed fire time) occurred, 
-	 * we can fire the job immediately, or on next regular schedule(default).
+	 * we can fire the job immediately, or on next regular schedule(default). 
+	 * The repeat count of timer (if it supports) remains always same, no matter how many times it was missed.
 	 * This somehow simplifies the rules available in Quartz, but should be enough.
 	 * 
 	 * @param fireImmediateAfterMisfire

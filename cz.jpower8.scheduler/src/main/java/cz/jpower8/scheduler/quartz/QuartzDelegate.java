@@ -52,9 +52,19 @@ public class QuartzDelegate implements IScheduler {
 		try {
 			log.info("Scheduler start");
 			quartz = StdSchedulerFactory.getDefaultScheduler();
+			
+			//shutdown scheduler on system shutdown
 			ShutdownHookPlugin shutdownHookPlugin = new ShutdownHookPlugin();
 			shutdownHookPlugin.setCleanShutdown(false);
 			shutdownHookPlugin.initialize("shutdown hook", quartz, null);
+			
+//			//add db history
+//			if (JobStoreSupport.class.isAssignableFrom(quartz.getMetaData().getJobStoreClass())){
+//				JdbcHistoryLogger jdbcHistoryLogger = new JdbcHistoryLogger();
+//				jdbcHistoryLogger.initialize("", scheduler, loadHelper);
+//			}
+//			
+			
 		} catch (SchedulerException e) {
 			throw new RuntimeException(e);
 		}

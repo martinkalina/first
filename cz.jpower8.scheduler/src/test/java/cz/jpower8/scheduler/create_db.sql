@@ -167,4 +167,25 @@ create index idx_qrtz_ft_t_g on qrtz_fired_triggers(SCHED_NAME,TRIGGER_NAME,TRIG
 create index idx_qrtz_ft_tg on qrtz_fired_triggers(SCHED_NAME,TRIGGER_GROUP);
 
 
+-- Table: sched_task_history
+
+-- DROP TABLE sched_task_history;
+
+CREATE TABLE sched_task_history
+(
+  id serial NOT NULL,
+  job_name character varying(200) NOT NULL,
+  job_group character varying(200) NOT NULL,
+  sched_name character varying(120) NOT NULL,
+  schedule_time timestamp without time zone NOT NULL,
+  fire_time timestamp without time zone NOT NULL,
+  refire_count integer NOT NULL DEFAULT 0,
+  job_run_time bigint NOT NULL,
+  failed boolean NOT NULL DEFAULT false,
+  CONSTRAINT pk PRIMARY KEY (id)
+)
+
+
+
+
 commit; 

@@ -1,6 +1,7 @@
 package cz.jpower8.scheduler;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.quartz.SchedulerException;
 
@@ -10,6 +11,11 @@ import cz.jpower8.scheduler.quartz.QuartzDelegate;
 
 public class TestSchedulePersistence extends JobTestSupport {
 
+	@Before
+	public void setup(){
+		new JdbcHelper().dropDb();
+		new JdbcHelper().createDb();
+	}
 	
 	@Test
 	public void testSchedulePersistence() throws InterruptedException, SchedulerException {
