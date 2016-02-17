@@ -21,7 +21,7 @@ public class TestDataPersistence {
 
 	@Before
 	public void init() {
-		JdbcHelper jdbcHelper = new JdbcHelper();
+		DbHelper jdbcHelper = new DbHelper();
 		jdbcHelper.dropDb();
 		jdbcHelper.createDb();
 	}

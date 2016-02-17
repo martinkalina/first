@@ -32,8 +32,8 @@ public class TestRecovery extends JobTestSupport {
 
 	@Test
 	public void systemFailure() throws Exception {
-		new JdbcHelper().dropDb();
-		new JdbcHelper().createDb();
+		new DbHelper().dropDb();
+		new DbHelper().createDb();
 		QuartzDelegate quartzDelegate = new QuartzDelegate("quartz-jdbc-store.properties");
 		quartzDelegate.getQuartz().clear();
 		Task task = new Task("failing-task");

@@ -16,8 +16,8 @@ public class StressTest {
 	
 	@Test
 	public void test() throws Exception {
-		new JdbcHelper().dropDb();
-		new JdbcHelper().createDb();
+		new DbHelper().dropDb();
+		new DbHelper().createDb();
 		QuartzDelegate quartz = new QuartzDelegate("quartz-performance.properties");
 		quartz.start();
 		

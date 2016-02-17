@@ -13,8 +13,8 @@ public class TestSchedulePersistence extends JobTestSupport {
 
 	@Before
 	public void setup(){
-		new JdbcHelper().dropDb();
-		new JdbcHelper().createDb();
+		new DbHelper().dropDb();
+		new DbHelper().createDb();
 	}
 	
 	@Test
@@ -23,11 +23,13 @@ public class TestSchedulePersistence extends JobTestSupport {
 		quartz1.getQuartz().clear(); // persistent quartz must be cleared
 		Task task = new Task("persistent");
 		task.setJobClass(TestSchedulePersistence.class.getName());
-		task.setTrigger(new SimpleTimer(2, 2));
+		SimpleTimer trigger = new SimpleTimer(2, 2);
+		trigger.setFireImmediateAfterMisfire(true);
+		task.setTrigger(trigger);
 		quartz1.schedule(task);
 		quartz1.start();
 		//just run once, then shutdown
-		Thread.sleep(1000);
+		Thread.sleep(100);
 		quartz1.shutDown();
 		Assert.assertEquals(1, getExecuted());
 		
