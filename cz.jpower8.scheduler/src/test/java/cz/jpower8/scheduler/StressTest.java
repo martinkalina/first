@@ -15,7 +15,7 @@ public class StressTest {
 //	private static final Logger log = LoggerFactory.getLogger(StressTest.class);
 	
 	@Test
-	public void test() throws Exception {
+	public void test1000() throws Exception {
 		new DbHelper().dropDb();
 		new DbHelper().createDb();
 		QuartzDelegate quartz = new QuartzDelegate("quartz-performance.properties");
@@ -38,6 +38,25 @@ public class StressTest {
 			if (keys.isEmpty()) break;
 			
 		}
+	}
+	
+//	@Test
+	public void testJmx() throws InterruptedException{
+		QuartzDelegate quartz = new QuartzDelegate("quartz-performance.properties");
+		quartz.start();
+		int  i = 0; 
+		while(true){
+			Thread.sleep(100);
+			Task task = new Task("Random_Task_" + i );
+			task.setDescription("This is a description of my task " + i);
+			task.setJobClass(StressMeterJob.class.getName());
+			task.addParameter(StressMeterJob.JOB_DURATION, (long)(100 * Math.random()));  //wait inside 0-100 ms
+			task.setTrigger(new SimpleTimer(((int)(Math.random()*10))+1, ((int)(Math.random()*10))));
+			quartz.schedule(task);
+			i++;
+			
+		}
+		
 	}
 
 
